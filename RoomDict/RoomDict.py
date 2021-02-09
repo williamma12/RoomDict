@@ -1,14 +1,13 @@
 import os
 import shelve
-import sys
 
 from RoomDict.LRUCache import CacheRecord, LRUCache
 
-class RoomDict():
 
-    def __init__(self, max_cache_size : int = None):
-       self.max_cache_size = max_cache_size
-       self.valid = False
+class RoomDict:
+    def __init__(self, max_cache_size: int = None):
+        self.max_cache_size = max_cache_size
+        self.valid = False
 
     def __enter__(self):
         self.valid = True
@@ -28,7 +27,7 @@ class RoomDict():
         if not self.valid:
             raise ValueError("RoomDict has not been opened.")
 
-    def put(self, key : str, value : object):
+    def put(self, key: str, value: object):
         """Put key with associated value to dict.
 
         Parameters
@@ -45,7 +44,7 @@ class RoomDict():
         if evicted is not None:
             self.kv_store[key] = value
 
-    def get(self, key : str):
+    def get(self, key: str):
         """Get key from dict.
 
         Parameters

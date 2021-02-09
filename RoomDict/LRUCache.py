@@ -5,20 +5,30 @@ from typing import Optional
 HEAD_KEY = "__HEAD__"
 TAIL_KEY = "__TAIL__"
 
+
 @dataclass
 class CacheRecord:
     key: str
     value: object
 
+
 class CacheNode(object):
-    def __init__(self, record : CacheRecord, next_node : Optional[CacheNode] = None, prev_node : Optional[CacheNode] = None):
+    def __init__(
+        self,
+        record: CacheRecord,
+        next_node: Optional[CacheNode] = None,
+        prev_node: Optional[CacheNode] = None,
+    ):
         self.record = record
         self.next = next_node
         self.prev = prev_node
 
+
 class LRUCache(object):
     def __init__(self, max_size):
-        assert max_size > 0, f"Max size should be greater than 0. Max size is {max_size}"
+        assert (
+            max_size > 0
+        ), f"Max size should be greater than 0. Max size is {max_size}"
 
         self.max_size = max_size
         self.curr_size = 0
@@ -30,7 +40,7 @@ class LRUCache(object):
 
         self.directory = {}
 
-    def put(self, record : CacheRecord) -> Optional[CacheRecord]:
+    def put(self, record: CacheRecord) -> Optional[CacheRecord]:
         """Puts a key and value to the cache.
 
         Parameters
@@ -50,7 +60,7 @@ class LRUCache(object):
         if key in self.directory:
             self.directory[key].record = record
             return None
-        
+
         if self.curr_size < self.max_size:
             self.curr_size += 1
             evicted = None
@@ -72,12 +82,12 @@ class LRUCache(object):
         new_node.next = curr_head
         curr_head.prev = new_node
         self.cache_head.next = new_node
-        
+
         self.directory[key] = new_node
 
         return evicted
 
-    def get(self, key : str) -> Optional[CacheRecord]:
+    def get(self, key: str) -> Optional[CacheRecord]:
         """Gets the associated record from cache if exists.
 
         Parameters

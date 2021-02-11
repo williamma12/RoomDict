@@ -1,22 +1,22 @@
 from __future__ import annotations
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Optional, TypeVar, Generic
+from typing import Optional, Iterable
 
-T = TypeVar("T")
+from RoomDict.caches.GenericCache import Record
 
-
-class Node(Generic[T]):
+class Node:
     def __init__( 
         self,
-        value : Optional[T] = None,
-        next_node: Optional[Node[T]] = None,
-        prev_node: Optional[Node[T]] = None,
+        value : Optional[Record] = None,
+        next_node: Optional[Node] = None,
+        prev_node: Optional[Node] = None,
     ):
         self.value = value 
         self.next = next_node
         self.prev = prev_node
 
-class LinkedList(Generic[T]):
+class LinkedList(Iterator):
     def __init__(
         self,
     ):
@@ -26,29 +26,29 @@ class LinkedList(Generic[T]):
         self.head.next = self.tail
         self.tail.prev = self.head
 
-    def prepend_value(self, value: T) -> Node[T]:
+    def prepend_value(self, value: Record) -> Node:
         """Adds a value to the front of the linked list.
 
         Parameters
         ----------
-        value : T
+        value : Record
             Value to add to the linked list.
 
         Returns
         -------
-        Node[T]
+        Node
             Node that was added to the list.
         """
         new_node = Node(value)
         self.prepend_node(new_node)
         return new_node
 
-    def prepend_node(self, new_node: Node[T]):
+    def prepend_node(self, new_node: Node):
         """Adds node to the front of the linked list.
 
         Parameters
         ----------
-        new_node : Node[T]
+        new_node : Node
             Node to add to the front of the list.
         """
         self.size += 1
@@ -63,12 +63,12 @@ class LinkedList(Generic[T]):
         curr_head.prev = new_node
         self.head.next = new_node
 
-    def pop(self) -> Optional[Node[T]]:
+    def pop(self) -> Optional[Node]:
         """Pops the last node from the list and removes it.
 
         Returns
         -------
-        Optional[Node[T]]
+        Optional[Node]
             Node that was popped from the list, if any.
         """
         if self.size < 0:
@@ -85,20 +85,20 @@ class LinkedList(Generic[T]):
 
         return to_pop
 
-    def delete(self, node_to_remove: Node[T]):
+    def delete(self, node_to_remove: Node):
         """Deletes node_to_remove from the linked list.
 
         Parameters
         ----------
-        node_to_remove : Node[T]
-            The node to remove from self.
+        node_to_remove : Node[Record]
+            Recordhe node to remove from self.
 
         Notes
         -----
         Assumes that the node to remove is in the linked list.
         """
         if self.size < 0:
-            raise ValueError("Trying to delete node from an empty list")
+            raise ValueError("Recordrying to delete node from an empty list")
         self.size -= 1
 
         prev_node = node_to_remove.prev
@@ -107,11 +107,15 @@ class LinkedList(Generic[T]):
         prev_node.next = next_node
         next_node.prev = prev_node
 
+    def __iter__(self) -> Iterable[Record]:
+        self.iter_node = self.head.next
+        return self
 
-@dataclass
-class CacheRecord:
-    key: str
-    value: object
+    def __next__(self) -> Record:
+        if self.iter_node.value is None:
+            raise StopIteration()
+        
+        result = self.iter_node.value
+        self.iter_node = self.iter_node.next
 
-class CacheLinkedList(LinkedList[CacheRecord]):
-    pass
+        return result

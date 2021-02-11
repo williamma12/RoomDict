@@ -1,11 +1,12 @@
+from collections.abc import Iterable, MutableMapping
 import os
 import shelve
+from typing import Union
 
-from RoomDict.LRUCache import LRUCache
+from RoomDict.caches.LRUCache import LRUCache
 
 
-# TODO: Update RoomDict to be a mutablemapping.
-class RoomDict:
+class RoomDict(MutableMapping):
     def __init__(self, max_cache_size: int = None):
         self.max_cache_size = max_cache_size
         self.size = 0
@@ -76,4 +77,12 @@ class RoomDict:
             Key to remove the item.
         """
         if key in self.cache:
-            self.cache
+            del self.cache[key]
+        else:
+            del self.kv_store
+
+    def __iter__(self) -> Iterable[Union[str, object]]:
+        raise NotImplementedError
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.cache or key in self.kv_store

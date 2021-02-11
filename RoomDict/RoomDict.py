@@ -4,6 +4,7 @@ import shelve
 from RoomDict.LRUCache import CacheRecord, LRUCache
 
 
+# TODO: Update RoomDict to be a mutablemapping.
 class RoomDict:
     def __init__(self, max_cache_size: int = None):
         self.max_cache_size = max_cache_size

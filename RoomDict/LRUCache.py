@@ -4,6 +4,7 @@ from typing import Mapping, Optional
 from RoomDict.LinkedList import CacheRecord, CacheLinkedList, Node
 
 
+# TODO: Update LRUCache to be a mutablemapping.
 class LRUCache(object):
     def __init__(self, max_size):
         assert (

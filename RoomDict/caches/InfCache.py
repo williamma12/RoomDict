@@ -1,12 +1,13 @@
 from collections.abc import Iterable
-from typing import Optional, Union
+from typing import Union
 
 from RoomDict.caches.GenericCache import GenericCache, Record
+
 
 class InfCache(GenericCache):
     def __init__(self):
         self.directory: dict[str, object] = {}
-        
+
         super().__init__()
 
     def put(self, key: str, value: object):
@@ -25,4 +26,3 @@ class InfCache(GenericCache):
 
     def __contains__(self, key: str) -> bool:
         return key in self.directory
-

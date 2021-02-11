@@ -1,13 +1,14 @@
-from __future__ import annotations
 import abc
 from dataclasses import dataclass
 from collections.abc import Iterable, MutableMapping
-from typing import Mapping, Optional, Union
+from typing import Optional, Union
+
 
 @dataclass
 class Record:
     key: str
     value: object
+
 
 class GenericCache(MutableMapping):
     def __init__(self):
@@ -19,7 +20,7 @@ class GenericCache(MutableMapping):
 
         Parameters
         ----------
-        key : str 
+        key : str
             strey to add to the cache.
         value : object
             objectalue to add with the key to the cache.
@@ -68,4 +69,3 @@ class GenericCache(MutableMapping):
 
     def __setitem__(self, key: str, value: object):
         self.put(key, value)
-

@@ -1,20 +1,21 @@
 from __future__ import annotations
 from collections.abc import Iterator
-from dataclasses import dataclass
 from typing import Optional, Iterable
 
 from RoomDict.caches.GenericCache import Record
 
+
 class Node:
-    def __init__( 
+    def __init__(
         self,
-        value : Optional[Record] = None,
+        value: Optional[Record] = None,
         next_node: Optional[Node] = None,
         prev_node: Optional[Node] = None,
     ):
-        self.value = value 
+        self.value = value
         self.next = next_node
         self.prev = prev_node
+
 
 class LinkedList(Iterator):
     def __init__(
@@ -72,7 +73,7 @@ class LinkedList(Iterator):
             Node that was popped from the list, if any.
         """
         if self.size < 0:
-            return None 
+            return None
         self.size -= 1
 
         # Create nodes and get get current last node.
@@ -114,7 +115,7 @@ class LinkedList(Iterator):
     def __next__(self) -> Record:
         if self.iter_node.value is None:
             raise StopIteration()
-        
+
         result = self.iter_node.value
         self.iter_node = self.iter_node.next
 

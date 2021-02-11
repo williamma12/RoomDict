@@ -35,7 +35,7 @@ class LRUCache(GenericCache):
             del self.directory[evicted_value.key]
 
         new_list_value = self.lru_list.prepend_value(record)
-        self.directory[key] = new_list_value 
+        self.directory[key] = new_list_value
 
         return evicted_value
 
@@ -44,7 +44,7 @@ class LRUCache(GenericCache):
             return None
 
         node = self.directory[key]
-        
+
         self.lru_list.delete(node)
         self.lru_list.prepend_node(node)
 

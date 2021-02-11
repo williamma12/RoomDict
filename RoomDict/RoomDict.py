@@ -67,7 +67,7 @@ class RoomDict(MutableMapping):
             result = result.value
 
         return result
-    
+
     def __delitem__(self, key: str):
         """Removes item from dict.
 

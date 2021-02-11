@@ -1,13 +1,14 @@
 import os
 import shelve
 
-from RoomDict.LRUCache import CacheRecord, LRUCache
+from RoomDict.LRUCache import LRUCache
 
 
 # TODO: Update RoomDict to be a mutablemapping.
 class RoomDict:
     def __init__(self, max_cache_size: int = None):
         self.max_cache_size = max_cache_size
+        self.size = 0
         self.valid = False
 
     def __enter__(self):
@@ -28,7 +29,10 @@ class RoomDict:
         if not self.valid:
             raise ValueError("RoomDict has not been opened.")
 
-    def put(self, key: str, value: object):
+    def __len__(self):
+        return self.size
+
+    def __setitem__(self, key: str, value: object):
         """Put key with associated value to dict.
 
         Parameters
@@ -39,13 +43,14 @@ class RoomDict:
             Value to store with key.
         """
         self.check_valid()
+        self.size += 1
 
-        evicted = self.cache.put(CacheRecord(key, value))
+        evicted = self.cache.put(key, value)
 
         if evicted is not None:
             self.kv_store[key] = value
 
-    def get(self, key: str):
+    def __getitem__(self, key: str):
         """Get key from dict.
 
         Parameters
@@ -53,7 +58,6 @@ class RoomDict:
         key : str
             Key to get the value.
         """
-
         result = self.cache.get(key)
 
         if result is None:
@@ -62,3 +66,14 @@ class RoomDict:
             result = result.value
 
         return result
+    
+    def __delitem__(self, key: str):
+        """Removes item from dict.
+
+        Parameters
+        ----------
+        key : str
+            Key to remove the item.
+        """
+        if key in self.cache:
+            self.cache

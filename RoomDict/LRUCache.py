@@ -5,6 +5,7 @@ from RoomDict.LinkedList import CacheRecord, CacheLinkedList, Node
 
 
 # TODO: Update LRUCache to be a mutablemapping.
+# TODO: LRUCache should be a child of an ABC container class.
 class LRUCache(object):
     def __init__(self, max_size):
         assert (
@@ -16,7 +17,7 @@ class LRUCache(object):
         self.lru_list = CacheLinkedList()
         self.directory: dict[str, Node] = {}
 
-    def put(self, record: CacheRecord) -> Optional[CacheRecord]:
+    def put(self, key: str, value: object) -> Optional[CacheRecord]:
         """Puts a key and value to the cache.
 
         Parameters
@@ -28,7 +29,7 @@ class LRUCache(object):
         -------
         Returns the evicted CacheRecord. If nothing was evicted, then None.
         """
-        key = record.key
+        record = CacheRecord(key, value)
 
         if key in self.directory:
             self.directory[key].value = record
@@ -70,3 +71,35 @@ class LRUCache(object):
         self.lru_list.prepend_node(node)
 
         return node.value
+
+    def __delitem__(self, key: str):
+        """Deletes item from LRU Cache.
+
+        Parameters
+        ----------
+        key : str
+            Key to delete from the cache.
+
+        Notes
+        -----
+        Assumes that the key is in the cache.
+        """
+        node = self.directory[key]
+        self.lru_list.delete(node)
+
+        del self.directory[key]
+    
+    def __contains__(self, key: str) -> bool:
+        """Check if key is in this cache layer.
+
+        Parameters
+        ----------
+        key : str
+            Key to look for.
+
+        Returns
+        -------
+        bool
+            True if in the cache. False otherwise.
+        """
+        return key in self.directory

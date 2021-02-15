@@ -20,11 +20,19 @@ class RoomDict(MutableMapping):
         # Create shelve kv-store.
         self.directory = ".RoomDict"
         self.out_of_mem_file = "RoomDict"
-        os.mkdir(self.directory)
+
+        if not os.path.exists(f"{self.directory}/{self.out_of_mem_file}"):
+            os.mkdir(self.directory)
         self.kv_store = shelve.open(f"{self.directory}/{self.out_of_mem_file}")
+
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.kv_store.close()
+
+        if os.path.exists(f"{self.directory}/{self.out_of_mem_file}"):
+            os.remove(f"{self.directory}/{self.out_of_mem_file}")
+            os.rmdir(self.directory)
 
     def check_valid(self):
         if not self.valid:

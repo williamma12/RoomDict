@@ -60,7 +60,7 @@ class LRUCache(GenericCache):
 
         del self.directory[key]
 
-    def __iter__(self) -> Iterable[Union[str, object]]:
+    def __iter__(self) -> Iterable:
         self.record_iter = iter(self.lru_list)
         return self
 

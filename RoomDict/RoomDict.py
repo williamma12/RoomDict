@@ -81,7 +81,7 @@ class RoomDict(MutableMapping):
         else:
             del self.kv_store
 
-    def __iter__(self) -> Iterable[Union[str, object]]:
+    def __iter__(self) -> Iterable:
         raise NotImplementedError
 
     def __contains__(self, key: str) -> bool:

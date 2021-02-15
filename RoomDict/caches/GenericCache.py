@@ -51,7 +51,7 @@ class GenericCache(MutableMapping):
         pass
 
     @abc.abstractmethod
-    def __iter__(self) -> Iterable[Union[str, object]]:
+    def __iter__(self) -> Iterable:
         pass
 
     @abc.abstractmethod

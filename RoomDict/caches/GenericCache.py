@@ -4,8 +4,8 @@ from collections.abc import Iterable, MutableMapping
 from typing import Optional, Union
 import uuid
 
-from RoomDict.storage_backends.GenericStorage import GenericStorage
 from RoomDict.membership_tests.GenericMembership import GenericMembership
+from RoomDict.storage_backends.GenericStorage import GenericStorage
 
 
 @dataclass
@@ -16,7 +16,7 @@ class Record:
 
 class GenericCache(MutableMapping):
     def __init__(
-        self, storage_manager: GenericStorage, membership_test: GenericMembership
+            self, membership_test: GenericMembership, storage_manager: GenericStorage
     ):
         self.size = 0
         self.storage_manager = storage_manager
@@ -63,10 +63,10 @@ class GenericCache(MutableMapping):
         pass
 
     def __contains__(self, key: str) -> bool:
-        if key not in self.membership_test:
-            return key in self.storage_manager
-        else:
+        if key in self.membership_test:
             return True
+        else:
+            return key in self.storage_manager
 
     def __len__(self) -> int:
         return self.size

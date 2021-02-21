@@ -3,12 +3,12 @@ from typing import Optional, Union
 
 from RoomDict.caches.LinkedList import LinkedList, Node
 from RoomDict.caches.GenericCache import GenericCache, Record
+from RoomDict.membership_tests.GenericMembership import GenericMembership
 from RoomDict.storage_backends.GenericStorage import GenericStorage
 
 
-# TODO: Change so that only the records are stored in the storage manager.
 class LRUCache(GenericCache):
-    def __init__(self, storage_manager: GenericStorage, max_size: int):
+    def __init__(self, membership_test: GenericMembership, storage_manager: GenericStorage, max_size: int):
         assert (
             max_size > 0
         ), f"Max size should be greater than 0. Max size is {max_size}"
@@ -16,7 +16,7 @@ class LRUCache(GenericCache):
         self.max_size = max_size
         self.lru_list = LinkedList()
 
-        super().__init__(storage_manager)
+        super().__init__(membership_test, storage_manager)
 
         # Hack to get the typing to work.
         self.storage_manager: MutableMapping[str, Node]
@@ -57,14 +57,13 @@ class LRUCache(GenericCache):
         return stored_record.value
 
     def __delitem__(self, key: str):
-        assert key in self
+        if key in self:
+            self.size -= 1
 
-        self.size -= 1
+            node = self.storage_manager[key]
+            self.lru_list.delete(node)
 
-        node = self.storage_manager[key]
-        self.lru_list.delete(node)
-
-        del self.storage_manager[key]
+            del self.storage_manager[key]
 
     def __iter__(self) -> Iterable:
         self.record_iter = iter(self.lru_list)

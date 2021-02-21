@@ -1,27 +1,31 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, MutableMapping
 from typing import Optional, Union
 
 from RoomDict.caches.LinkedList import LinkedList, Node
 from RoomDict.caches.GenericCache import GenericCache, Record
+from RoomDict.storage_backends.GenericStorage import GenericStorage
 
 
+# TODO: Change so that only the records are stored in the storage manager.
 class LRUCache(GenericCache):
-    def __init__(self, max_size):
+    def __init__(self, storage_manager: GenericStorage, max_size: int):
         assert (
             max_size > 0
         ), f"Max size should be greater than 0. Max size is {max_size}"
 
         self.max_size = max_size
         self.lru_list = LinkedList()
-        self.directory: dict[str, Node] = {}
 
-        super().__init__()
+        super().__init__(storage_manager)
 
-    def put(self, key: str, value: object) -> Optional[Record]:
+        # Hack to get the typing to work.
+        self.storage_manager: MutableMapping[str, Node]
+
+    def put(self, key: str, value: object) -> Optional[Union[str, object]]:
         record = Record(key, value)
 
-        if key in self.directory:
-            self.directory[key].value = record
+        if key in self.storage_manager:
+            self.storage_manager[key].value = record
             return None
 
         if self.size < self.max_size:
@@ -32,33 +36,35 @@ class LRUCache(GenericCache):
             if evicted_value is None:
                 raise ValueError("No value to evict.")
 
-            del self.directory[evicted_value.key]
+            del self.storage_manager[evicted_value.key]
 
         new_list_value = self.lru_list.prepend_value(record)
-        self.directory[key] = new_list_value
+        self.storage_manager[key] = new_list_value
 
-        return evicted_value
+        if evicted_value is not None:
+            return evicted_value.key, evicted_value.value
 
-    def get(self, key: str) -> Optional[Record]:
-        if key not in self.directory:
+    def get(self, key: str) -> Optional[object]:
+        if key not in self.storage_manager:
             return None
 
-        node = self.directory[key]
+        node = self.storage_manager[key]
 
         self.lru_list.delete(node)
         self.lru_list.prepend_node(node)
 
-        return node.value
+        stored_record = node.value
+        return stored_record.value
 
     def __delitem__(self, key: str):
         assert key in self
 
         self.size -= 1
 
-        node = self.directory[key]
+        node = self.storage_manager[key]
         self.lru_list.delete(node)
 
-        del self.directory[key]
+        del self.storage_manager[key]
 
     def __iter__(self) -> Iterable:
         self.record_iter = iter(self.lru_list)
@@ -67,6 +73,3 @@ class LRUCache(GenericCache):
     def __next__(self) -> Union[str, object]:
         next_record: Record = next(self.record_iter)
         return (next_record.key, next_record.value)
-
-    def __contains__(self, key: str) -> bool:
-        return key in self.directory

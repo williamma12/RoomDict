@@ -1,96 +1,137 @@
 from collections.abc import Iterable, MutableMapping
 import os
 import shelve
-from typing import Union
+from typing import List, Optional, Union
 
-from RoomDict.caches.LRUCache import LRUCache
+from RoomDict.caches import LRUCache, InfCache
+from RoomDict.storage_backends import DiskStorage, MemoryStorage
+
+STORAGE_BACKEND_MAPPING = {
+    "memory": MemoryStorage,
+    "disk": DiskStorage,
+}
+CACHE_POLICY_MAPPING = {
+    "lru": LRUCache,
+    "none": InfCache,
+}
 
 
+# TODO: Add membership test for initialization here and caches.
 class RoomDict(MutableMapping):
-    def __init__(self, max_cache_size: int = None):
-        self.max_cache_size = max_cache_size
-        self.size = 0
-        self.valid = False
+    def __init__(
+        self,
+        cache_policies: List[str],
+        storage_backends: List[str],
+        cache_policies_kwargs: Optional[List[dict]] = None,
+        storage_backends_kwargs: Optional[List[dict]] = None,
+    ):
+        """Initialize a RoomDict with the given storage_backends and cache_policies.
+
+        Parameters
+        ----------
+        storage_backends : List[str]
+            List of storage backend strings. Order implies the storage hierarchy.
+        cache_policies : List[str]
+            List of cache policy strings. Corresponds to the storage_backends
+        storage_backends_kwargs : List[dict]
+            Dictionary of storage backend initialization kwargs.
+        cache_policies_kwargs: List[dict]
+            Dictionary of cache policies initialization kwargs.
+
+        Returns
+        -------
+        RoomDict
+            RoomDict with chosen parameters.
+        """
+        assert len(storage_backends) == len(
+            cache_policies
+        ), "Must have equal numbers of storage backends and cache policies."
+
+        if storage_backends_kwargs is None:
+            storage_backends_kwargs = []
+        if cache_policies_kwargs is None:
+            cache_policies_kwargs = []
+
+        if len(storage_backends_kwargs) != len(storage_backends):
+            storage_backends_kwargs += [{}] * (
+                len(storage_backends) - len(storage_backends_kwargs)
+            )
+        if len(cache_policies_kwargs) != len(cache_policies):
+            cache_policies_kwargs += [{}] * (
+                len(cache_policies) - len(cache_policies_kwargs)
+            )
+
+        self._initialize_cache_and_storage(
+            cache_policies,
+            storage_backends,
+            cache_policies_kwargs,
+            storage_backends_kwargs,
+        )
+
+    def _initialize_cache_and_storage(
+        self,
+        cache_policies: List[str],
+        storage_backends: List[str],
+        cache_policies_kwargs: List[dict],
+        storage_backends_kwargs: List[dict],
+    ):
+        self.caches = []
+        self.storage_backends = []
+        for storage_backend, cache_policy, storage_kwargs, cache_kwargs, in zip(
+            storage_backends,
+            cache_policies,
+            storage_backends_kwargs,
+            cache_policies_kwargs,
+        ):
+            storage_backend = STORAGE_BACKEND_MAPPING[storage_backend]
+            cache_policy = CACHE_POLICY_MAPPING[cache_policy]
+
+            storage_backend = storage_backend(**storage_kwargs)
+            self.caches.append(cache_policy(storage_backend, **cache_kwargs))
+            self.storage_backends.append(storage_backend)
 
     def __enter__(self):
-        self.valid = True
-
-        self.cache = LRUCache(self.max_cache_size)
-
-        # Create shelve kv-store.
-        self.directory = ".RoomDict"
-        self.out_of_mem_file = "RoomDict"
-
-        if not os.path.exists(f"{self.directory}/{self.out_of_mem_file}"):
-            os.mkdir(self.directory)
-        self.kv_store = shelve.open(f"{self.directory}/{self.out_of_mem_file}")
-
+        for storage_backend in self.storage_backends:
+            storage_backend.open()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.kv_store.close()
-
-        if os.path.exists(f"{self.directory}/{self.out_of_mem_file}"):
-            os.remove(f"{self.directory}/{self.out_of_mem_file}")
-            os.rmdir(self.directory)
-
-    def check_valid(self):
-        if not self.valid:
-            raise ValueError("RoomDict has not been opened.")
+        for storage_backend in self.storage_backends:
+            storage_backend.close(exc_type, exc_value, traceback)
 
     def __len__(self):
-        return self.size
+        size = 0
+        for cache in self.caches:
+            size += len(cache)
 
-    def __setitem__(self, key: str, value: object):
-        """Put key with associated value to dict.
+    def __setitem__(self, key: str, value: int):
+        if key in self:
+            old_value = self.pop(key)
+            value += value
 
-        Parameters
-        ----------
-        key : str
-            Unique key to the value.
-        value : object
-            Value to store with key.
-        """
-        self.check_valid()
-        self.size += 1
+        evicted = (key, value)
+        for cache in self.caches:
+            evicted = cache.put(*evicted)
+            if evicted is None:
+                return None
 
-        evicted = self.cache.put(key, value)
-
-        if evicted is not None:
-            self.kv_store[key] = value
+        return evicted
 
     def __getitem__(self, key: str):
-        """Get key from dict.
-
-        Parameters
-        ----------
-        key : str
-            Key to get the value.
-        """
-        result = self.cache.get(key)
-
-        if result is None:
-            result = self.kv_store[key]
-        else:
-            result = result.value
-
-        return result
+        for cache in self.caches:
+            if key in cache:
+                return cache.get(key)
 
     def __delitem__(self, key: str):
-        """Removes item from dict.
-
-        Parameters
-        ----------
-        key : str
-            Key to remove the item.
-        """
-        if key in self.cache:
-            del self.cache[key]
-        else:
-            del self.kv_store
+        for cache in self.caches:
+            if key in cache:
+                del cache[key]
 
     def __iter__(self) -> Iterable:
         raise NotImplementedError
 
     def __contains__(self, key: str) -> bool:
-        return key in self.cache or key in self.kv_store
+        for cache in self.caches:
+            if key in cache:
+                return True
+        return False

@@ -2,7 +2,6 @@ import abc
 from dataclasses import dataclass
 from collections.abc import Iterable, MutableMapping
 from typing import Optional, Union
-import uuid
 
 from RoomDict.membership_tests.GenericMembership import GenericMembership
 from RoomDict.storage_backends.GenericStorage import GenericStorage
@@ -16,7 +15,9 @@ class Record:
 
 class GenericCache(MutableMapping):
     def __init__(
-            self, membership_test: GenericMembership, storage_manager: GenericStorage
+        self,
+        membership_test: GenericMembership,
+        storage_manager: GenericStorage,  # noaq: E501
     ):
         self.size = 0
         self.storage_manager = storage_manager

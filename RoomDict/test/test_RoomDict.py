@@ -1,5 +1,3 @@
-import pytest
-
 from RoomDict.RoomDict import RoomDict
 
 from RoomDict.test.utils import assert_equal
@@ -31,7 +29,13 @@ def test_put_and_get_with_eviction():
     membership_test_kwargs = [{"max_size": 10, "error_rate": 0.01}]
     storage_backends = ["memory"]
 
-    with RoomDict(cache_policies, membership_tests, storage_backends, cache_kwargs, membership_test_kwargs) as cache:
+    with RoomDict(
+        cache_policies,
+        membership_tests,
+        storage_backends,
+        cache_kwargs,
+        membership_test_kwargs,
+    ) as cache:
         for i in range(10):
             test_key = key.format(i)
             test_value = value.format(i)

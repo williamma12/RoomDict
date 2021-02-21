@@ -1,12 +1,13 @@
 import os
 import shelve
-from typing import Optional, ContextManager
 
 from RoomDict.storage_backends.GenericStorage import GenericStorage
 
 
 class DiskStorage(GenericStorage):
-    def __init__(self, directory: str = ".RoomDict", fname: str = "RoomDict.pkl"):
+    def __init__(
+        self, directory: str = ".RoomDict", fname: str = "RoomDict.pkl"
+    ):  # noqa: E501
         self.directory = directory
         self.path = f"{self.directory}/{fname}"
 
@@ -22,7 +23,7 @@ class DiskStorage(GenericStorage):
         # This is a hack to get the typing right.
         self.kv_store: shelve.Shelf
 
-    def close(self, exc_type = None, exc_value = None, traceback = None):
+    def close(self, exc_type=None, exc_value=None, traceback=None):
         self.kv_store.close()
 
         if os.path.exists(self.path):

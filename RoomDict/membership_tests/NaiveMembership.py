@@ -1,5 +1,3 @@
-import logging
-
 from RoomDict.membership_tests.GenericMembership import GenericMembership
 
 

@@ -1,5 +1,3 @@
-import logging
-
 from pybloom import BloomFilter
 
 from RoomDict.membership_tests.GenericMembership import GenericMembership

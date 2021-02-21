@@ -17,7 +17,9 @@ STORAGE_BACKEND = MemoryStorage
 
 
 @pytest.fixture
-def initialized_backends() -> Iterator[Tuple[GenericMembership, GenericStorage]]:
+def initialized_backends() -> Iterator[
+    Tuple[GenericMembership, GenericStorage]
+]:  # noqa: E501
     storage_backend = STORAGE_BACKEND()
     storage_backend.open()
     membership_test = MEMBERSHIP_TEST()

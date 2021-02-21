@@ -8,7 +8,12 @@ from RoomDict.storage_backends.GenericStorage import GenericStorage
 
 
 class LRUCache(GenericCache):
-    def __init__(self, membership_test: GenericMembership, storage_manager: GenericStorage, max_size: int):
+    def __init__(
+        self,
+        membership_test: GenericMembership,
+        storage_manager: GenericStorage,
+        max_size: int,
+    ):
         assert (
             max_size > 0
         ), f"Max size should be greater than 0. Max size is {max_size}"

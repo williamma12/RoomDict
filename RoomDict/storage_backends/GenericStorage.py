@@ -20,7 +20,7 @@ class GenericStorage(MutableMapping):
         pass
 
     @abc.abstractmethod
-    def close(self, exc_type = None, exc_value = None, traceback = None):
+    def close(self, exc_type=None, exc_value=None, traceback=None):
         pass
 
     def _open(self, kv_store: MutableMapping):

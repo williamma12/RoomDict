@@ -1,7 +1,5 @@
 from collections.abc import Iterable, MutableMapping
-import os
-import shelve
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from RoomDict.caches import LRUCache, InfCache
 from RoomDict.membership_tests import BloomMembership, NaiveMembership
@@ -40,7 +38,8 @@ class RoomDict(MutableMapping):
         membership_tests : List[str]
             List of membership test strings.
         storage_backends : List[str]
-            List of storage backend strings. Order implies the storage hierarchy.
+            List of storage backend strings.
+            Order implies the storage hierarchy.
         cache_policies_kwargs: Optional[List[dict]]
             Dictionary of cache policies initialization kwargs.
         membership_tests_kwargs: Optional[List[dict]]
@@ -97,7 +96,14 @@ class RoomDict(MutableMapping):
     ):
         self.caches = []
         self.storage_backends = []
-        for cache_policy, membership_test, storage_backend, cache_kwargs, membership_test_kwargs, storage_kwargs in zip(
+        for (
+            cache_policy,
+            membership_test,
+            storage_backend,
+            cache_kwargs,
+            membership_test_kwargs,
+            storage_kwargs,
+        ) in zip(
             cache_policies,
             membership_tests,
             storage_backends,
@@ -113,7 +119,9 @@ class RoomDict(MutableMapping):
             storage_backend = STORAGE_BACKEND_MAPPING[storage_backend]
             storage_backend = storage_backend(**storage_kwargs)
 
-            self.caches.append(cache_policy(membership_test, storage_backend, **cache_kwargs))
+            self.caches.append(
+                cache_policy(membership_test, storage_backend, **cache_kwargs)
+            )
             self.storage_backends.append(storage_backend)
 
     def __enter__(self):

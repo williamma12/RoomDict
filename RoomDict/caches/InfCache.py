@@ -14,6 +14,7 @@ class InfCache(GenericCache):
         super().__init__(membership_test, storage_manager)
 
     def put(self, key: str, value: object):
+        self.membership_test.add(key)
 
         self.storage_manager[key] = value
 

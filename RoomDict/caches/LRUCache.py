@@ -27,6 +27,8 @@ class LRUCache(GenericCache):
         self.storage_manager: MutableMapping[str, Node]
 
     def put(self, key: str, value: object) -> Optional[Union[str, object]]:
+        self.membership_test.add(key)
+
         record = Record(key, value)
 
         if key in self.storage_manager:

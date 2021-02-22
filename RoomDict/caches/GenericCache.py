@@ -65,9 +65,9 @@ class GenericCache(MutableMapping):
 
     def __contains__(self, key: str) -> bool:
         if key in self.membership_test:
-            return True
-        else:
             return key in self.storage_manager
+        else:
+            return False
 
     def __len__(self) -> int:
         return self.size
@@ -79,5 +79,4 @@ class GenericCache(MutableMapping):
         return result
 
     def __setitem__(self, key: str, value: object):
-        self.membership_test.add(key)
         self.put(key, value)

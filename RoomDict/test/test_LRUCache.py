@@ -11,7 +11,7 @@ from RoomDict.storage_backends.GenericStorage import GenericStorage
 from RoomDict.test.utils import assert_equal
 
 TEST_SIZE = 5
-TEST_RECORDS = [(f"test{i}", i) for i in range(2 * TEST_SIZE)]
+TEST_RECORDS = [("test{}".format(i), i) for i in range(2 * TEST_SIZE)]
 MEMBERSHIP_TEST = NaiveMembership
 STORAGE_BACKEND = MemoryStorage
 

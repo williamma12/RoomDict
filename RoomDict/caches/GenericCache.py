@@ -75,7 +75,7 @@ class GenericCache(MutableMapping):
     def __getitem__(self, key: str) -> object:
         result = self.get(key)
         if result is None:
-            raise ValueError(f"{key} does not exist.")
+            raise ValueError("{} does not exist.".format(key))
         return result
 
     def __setitem__(self, key: str, value: object):

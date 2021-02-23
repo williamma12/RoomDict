@@ -16,7 +16,7 @@ class LRUCache(GenericCache):
     ):
         assert (
             max_size > 0
-        ), f"Max size should be greater than 0. Max size is {max_size}"
+        ), "Max size should be greater than 0. Max size is {}".format(max_size)
 
         self.max_size = max_size
         self.lru_list = LinkedList()

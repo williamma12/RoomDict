@@ -10,7 +10,7 @@ class DiskStorage(GenericStorage):
         self, directory: str = ".RoomDict", fname: str = "RoomDict.pkl"
     ):  # noqa: E501
         self.directory = directory
-        self.path = f"{self.directory}/{fname}"
+        self.path = "{}/{}".format(self.directory, fname)
 
         super().__init__()
 

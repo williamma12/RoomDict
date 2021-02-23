@@ -3,7 +3,8 @@ import time
 
 import RoomDict.RoomDict as RoomDict
 
-DATA_SIZE = 1e6
+DATA_SIZE = int(1e5)
+# DATA_SIZE = int(1e2)
 CACHE_SIZE = 0.05 * DATA_SIZE
 
 def profile_data(data, **log_kwargs):
@@ -44,7 +45,7 @@ def profile_data(data, **log_kwargs):
                 }
         print("$$".join(["{}_{}".format(key, value) for key, value in profiling_log.items()]))
 
-        # time.sleep(10)
+        time.sleep(10)
 
 # Profile zipf distribution.
 zipf_scales = [1.01, 1.05, 1.1, 1.2]

@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from RoomDict.caches import LRUCache, InfCache
 from RoomDict.membership_tests import BloomMembership, NaiveMembership
-from RoomDict.storage_backends import DiskStorage, MemoryStorage
+from RoomDict.storage_backends import ArbitraryStorage, DiskStorage, MemoryStorage
 
 CACHE_POLICY_MAPPING = {
     "lru": LRUCache,
@@ -14,6 +14,7 @@ MEMBERSHIP_TEST_MAPPING = {
     "none": NaiveMembership,
 }
 STORAGE_BACKEND_MAPPING = {
+    "arbitrary": ArbitraryStorage,
     "memory": MemoryStorage,
     "disk": DiskStorage,
 }

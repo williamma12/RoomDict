@@ -16,11 +16,11 @@ def profile_data(data, **log_kwargs):
                 cache_policies = ["lru", "none"]
                 cache_kwargs = [{"max_size": CACHE_SIZE}]
                 storage_backends = ["memory", "arbitrary"]
-                storage_kwargs = {"delay": delay}
+                storage_kwargs = [{}, {"delay": delay}]
 
                 if use_bloom:
                     membership_tests = ["none", "bloom"]
-                    membership_test_kwargs = [{}, {"max_size": DATA_SIZE, "error_rate": ERROR_RATES}]
+                    membership_test_kwargs = [{}, {"max_size": DATA_SIZE, "error_rate": error_rate}]
                 else:
                     membership_tests = ["none", "none"]
                     membership_test_kwargs = []
@@ -51,7 +51,7 @@ def profile_data(data, **log_kwargs):
                         }
                 print("$$".join(["{}_{}".format(key, value) for key, value in profiling_log.items()]))
 
-                time.sleep(10)
+                # time.sleep(10)
 
 # Profile zipf distribution.
 zipf_scales = [1.01, 1.05, 1.1, 1.2]

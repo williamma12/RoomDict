@@ -64,7 +64,7 @@ class GenericCache(MutableMapping):
         pass
 
     def __contains__(self, key: str) -> bool:
-        if key in self.membership_test:
+        if key not in self.membership_test:
             return key in self.storage_manager
         else:
             return False

@@ -173,10 +173,8 @@ class RoomDict(MutableMapping):
         raise NotImplementedError
 
     def __contains__(self, key: str) -> bool:
-        exists = False
         for cache in self.caches:
             if key in cache:
-                exists = True
-                break
+                return True
 
-        return exists
+        return False

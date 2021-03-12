@@ -6,7 +6,7 @@ import RoomDict.RoomDict as RoomDict
 DATA_SIZE = int(1e5)
 # DATA_SIZE = int(1e2)
 CACHE_SIZES = [x * DATA_SIZE for x in [0.01, 0.1, 0.25, 0.5]]
-DELAYS = [1e-6, 1e-5, 1e-4, 1e-3, 1e-2]
+DELAYS = [1e-6, 1e-4, 1e-2]
 ERROR_RATES = [0.01, 0.1, 0.25, 0.5]
 
 def profile_data(data, **log_kwargs):
@@ -45,9 +45,11 @@ def profile_data(data, **log_kwargs):
 
                     profiling_log = {
                             "DATA_SIZE": DATA_SIZE,
-                            "CACHE_SIZE": CACHE_SIZE,
+                            "CACHE_SIZE": cache_size,
                             **log_kwargs,
                             "BLOOM": use_bloom,
+                            "ERROR_RATE": error_rate,
+                            "DELAY": delay,
                             "TIME": end-start,
                             }
                     print("$$".join(["{}_{}".format(key, value) for key, value in profiling_log.items()]))

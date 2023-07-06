@@ -20,7 +20,7 @@ pytest==6.2.2
 PyYAML==5.4.1
 regex==2020.11.13
 -e git+https://github.com/williamma12/RoomDict.git@d5cf7509b484820b46294da1bcb691b21c5a3abe#egg=RoomDict
-scipy==1.6.1
+scipy==1.10.0
 snakeviz==2.1.0
 toml==0.10.2
 tornado==6.1
